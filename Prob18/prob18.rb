@@ -32,32 +32,54 @@ t = Time.now()
 
 #split string into array - newline delimited
 tArray = treeStr.split("\n")
+tArray.collect {|x| x.to_i}
+
 #convert to 2d array
 vArray = tArray.collect {|x| x.split()}
+vArray = vArray.each do |x|
+  x.collect! { |y| y.to_i}
+end
+
 # To use as a counter for replacing array with temp array
 vLength = vArray.length - 1
 
 
 def consolidate_triangle_vertically(vArray)
-  vArray.reverse_each do |row|
-    tArray = nil
-    row.each do |ele|
-      largest = check_for_largest_neighbor( ele, vArray.index(ele) + 1) # bug here exists when you have 2 of the same numbers in a single row
-      tArray << largest # to be implemented, add these numbers to the layer above. 
+  tArray = []
+
+  vArray.reverse.each_with_index do |row, rowindex|
+    #puts "array index is #{rowindex}"
+    row.each_with_index do |ele, index|
+      if(row.length > index + 1)
+      # puts "row index is #{index}"
+        puts "Comparing #{ele.to_i} & #{row[index + 1].to_i}"
+        largest = check_for_largest_neighbor( ele, row[index +1])
+        puts "largest = #{largest}"
+        # puts "#{largest} is larger"
+
+        vArray.reverse[rowindex + 1][index] = largest + vArray[rowindex +1][index]
+        puts "now is #{vArray.reverse[rowindex + 1][index]}"
+      #  puts "adding #{largest.to_i} + #{vArray.reverse[rowindex][index].to_i}"
+      #  puts " storing: #{largest.to_i + vArray.reverse[rowindex][index].to_i}"
+      end
+
     end
 
   end
 
-
-
+  puts vArray
 end
 
-def check_for_largest_neighbor{a,b}
-  if( a > b)
+def check_for_largest_neighbor(a,b)
+  if(b == nil)
+    return a
+  elsif(a > b && b != nil)
     return a
   else
     return b
   end
 end
 
-puts "finished in #{(Time.now() - t).}"
+consolidate_triangle_vertically(vArray)
+
+puts "finished in #{(Time.now() - t)}"
